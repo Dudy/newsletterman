@@ -1,0 +1,31 @@
+nav {
+    margin-bottom: 20px;
+}
+
+.col ul {
+    border: solid 1px #008080;
+}
+
+li.media {
+    border-bottom: solid 1px #dddddd;
+    padding: 10px;
+}
+
+button.btn {
+    border-radius: 0;
+    width: 100%;
+    height: 4rem;
+    background-color: #008080;
+    color: #dddddd;
+}
+
+a {
+    color: #009980;
+}
+
+nav.navbar-light {
+    background-color: #cccccc;
+    color: #222222;
+    border-top: solid 2px #008080;
+    border-bottom: solid 2px #008080;
+}

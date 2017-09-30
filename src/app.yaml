@@ -3,5 +3,11 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: /.*
+- url: /
+  static_files: static/index.html
+  upload: static/index.html
+- url: /v1/.*
   script: main.app
+- url: /(.*)
+  static_files: static/\1
+  upload: static/(.*)
