@@ -2,12 +2,29 @@ runtime: python27
 api_version: 1
 threadsafe: true
 
+# [START handlers]
 handlers:
-- url: /
-  static_files: static/index.html
-  upload: static/index.html
-- url: /v1/.*
-  script: main.app
-- url: /(.*)
-  static_files: static/\1
-  upload: static/(.*)
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+
+- url: /bootstrap
+  static_dir: bootstrap
+- url: /jquery
+  static_dir: jquery
+- url: /css
+  static_dir: css
+
+
+
+- url: /.*
+  script: newsletterman.app
+# [END handlers]
+
+# [START libraries]
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
+# [END libraries]

@@ -1,0 +1,19 @@
+body {
+    padding-top: 80px;
+}
+
+a,
+a:hover {
+    color: #222222;
+}
+
+nav.navbar-light {
+    background-color: #dddddd;
+    color: #222222;
+    border-top: solid 2px #008080;
+    border-bottom: solid 2px #008080;
+}
+
+.btn  {
+    border-radius: 0px;
+}
