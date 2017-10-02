@@ -14,11 +14,16 @@ handlers:
   static_dir: jquery
 - url: /css
   static_dir: css
+- url: /images
+  static_dir: images
+- url: /js
+  static_dir: js
 
-
+- url: /v1/.*
+  script: ApiHandlerV1.app
 
 - url: /.*
-  script: newsletterman.app
+  script: Newsletterman.app
 # [END handlers]
 
 # [START libraries]

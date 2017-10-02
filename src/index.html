@@ -4,6 +4,7 @@
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Newsletterman</title>
 
         <!-- Bootstrap CSS -->
         <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
@@ -53,57 +54,66 @@
         </nav>
         
         <div class="container">
+            {% if user %}
             <div class="row">
-                <div class="media">
-                    <div class="media-left">
-                        <img src="http://via.placeholder.com/60x60" class="media-object" style="width:60px">
-                    </div>
-                    <div class="media-body">
-                        <h4 class="media-heading">John Doe</h4>
-                        <p>Lorem ipsum...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        
-
-<!--        <div class="container main">
-            <div class="row">
-                <div class="col">
+                <div class="col-xs-12">
                     <ul class="list-unstyled">
-                        <li class="media">
-                            <img class="d-flex mr-3" src="..." alt="Generic placeholder image">
+                        <li class="media" id="template_block">
+                            <div class="media-left">
+                                <img src="http://via.placeholder.com/60x60" class="media-object">
+                            </div>
                             <div class="media-body">
-                                <h5 class="mt-0 mb-1">List-based media object</h5>
-                                Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                                <h4>List-based media object</h4>
+                                <span>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</span>
+                            </div>
+                        </li>
+                        
+                        <!--
+                        <li class="media">
+                            <div class="media-left">
+                                <img src="http://via.placeholder.com/60x60" class="media-object">
+                            </div>
+                            <div class="media-body">
+                                <h4>List-based media object</h4>
+                                <span>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</span>
                             </div>
                         </li>
                         <li class="media">
-                            <img class="d-flex mr-3" src="..." alt="Generic placeholder image">
+                            <div class="media-left">
+                                <img src="http://via.placeholder.com/60x60" class="media-object">
+                            </div>
                             <div class="media-body">
-                                <h5 class="mt-0 mb-1">List-based media object</h5>
-                                Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                                <h4 class="mt-0 mb-1">List-based media object</h4>
+                                <span>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</span>
                             </div>
                         </li>
-                        <li class="media">
-                            <img class="d-flex mr-3" src="..." alt="Generic placeholder image">
-                            <div class="media-body">
-                                <h5 class="mt-0 mb-1">List-based media object</h5>
-                                Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-                            </div>
-                        </li>
+                        -->
                     </ul>
                 </div>
             </div>
+            
             <div class="row">
-                <div class="col">
-                    <button type="button" class="btn">more...</button>
+                <div class="col-xs-12">
+                    <button type="button" class="btn" id="next">more...</button>
                 </div>
             </div>
-        </div>-->
+            {% else %}
+            <div class="row">
+                <div class="col-xs-2 col-xs-offset-5">
+                    <img src="images/mailbox-296465.svg">
+                </div>
+                <div class="col-xs-2 col-xs-offset-5">
+                    <a href="{{ url|safe }}" class="btn login">{{ url_linktext }}</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
         
         <script src="jquery/jquery-3.2.1.min.js" type="text/javascript"></script>
         <script src="bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+        
+        {% if user %}
+        <script src="js/main.js" type="text/javascript"></script>
+        {% endif %}
     </body>
 </html>
