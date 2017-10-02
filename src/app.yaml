@@ -2,8 +2,30 @@ runtime: python27
 api_version: 1
 threadsafe: true
 
+# [START inbound services]
+inbound_services:
+- mail
+# [END inbound services]
+
 # [START handlers]
 handlers:
+# catch all incoming emails
+- url: /_ah/mail/.+
+  script: EmailHandlerV1.app
+  login: admin
+  
+# a more sophisticated approach
+#- url: /_ah/mail/owner@.*your_app_id\.appspotmail\.com
+#  script: handle_owner.app
+#  login: admin
+#- url: /_ah/mail/support@.*your_app_id\.appspotmail\.com
+#  script: handle_support.app
+#  login: admin
+#- url: /_ah/mail/.+
+#  script: handle_catchall.app
+#  login: admin
+# [END handlers]
+
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
@@ -24,7 +46,6 @@ handlers:
 
 - url: /.*
   script: Newsletterman.app
-# [END handlers]
 
 # [START libraries]
 libraries:
