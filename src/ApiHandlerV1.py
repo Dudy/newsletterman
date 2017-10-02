@@ -42,6 +42,6 @@ class ApiHandlerV1(webapp2.RequestHandler):
             self.error(403)
         
 app = webapp2.WSGIApplication([
-    webapp2.Route(r'/v1/newsletter', handler=ApiHandlerV1, handler_method='firstBatch', methods=['GET']),
-    webapp2.Route(r'/v1/newsletter/<current>/next', handler=ApiHandlerV1, name='current', handler_method='next', methods=['GET'])
+    webapp2.Route(r'/v1/api/newsletter', handler=ApiHandlerV1, handler_method='firstBatch', methods=['GET']),
+    webapp2.Route(r'/v1/api/newsletter/<current>/next', handler=ApiHandlerV1, name='current', handler_method='next', methods=['GET'])
 ], debug=True)

@@ -1,10 +1,28 @@
+var BASE_URI = "/v1";
 var $template_block = null;
 var currentItem = 0;
+
+var navActionHandler = function(event) {
+    event.preventDefault();
+    var url = BASE_URI + "/content/" + event.target.href.substring(event.target.href.indexOf("#") + 1);
+    $.get(url)
+    .done(function(content) {
+        $('#mainContent').empty();
+        $('#mainContent').append(content);
+    })
+    .fail(function(jqxhr, textStatus, error) {
+        var err = textStatus + ", " + error;
+        console.log("Request Failed: " + err);
+    });
+};
 
 $(document).ready(function() {
     $template_block = $('#template_block');
     
-    $.getJSON("/v1/newsletter")
+    // register action handler
+    $('.action').on('click touch', navActionHandler);
+    
+    $.getJSON(BASE_URI + "/api/newsletter")
     .done(function(newsletteritems) {
         newsletteritems.forEach(function(item) {
             var $newItem = $template_block.clone();
@@ -23,7 +41,7 @@ $(document).ready(function() {
     
     $('#next').on('click touch', function(event) {
         event.preventDefault();
-        $.getJSON("/v1/newsletter/" + currentItem + "/next")
+        $.getJSON(BASE_URI + "/api/newsletter/" + currentItem + "/next")
         .done(function(item) {
             var $newItem = $template_block.clone();
             $newItem.removeAttr('id');

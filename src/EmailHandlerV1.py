@@ -13,7 +13,9 @@ class EmailHandlerV1(InboundMailHandler):
         logging.info(mail_message.to_mime_message())
 
         # store message
-        persistent_mail_message = MailMessage(sender = mail_message.sender, mime_message = str(mail_message.to_mime_message()))
+        service_id = mail_message.to.split('@')[0]
+        mime_message = str(mail_message.to_mime_message())
+        persistent_mail_message = MailMessage(service_id = service_id, mime_message = mime_message)
         persistent_mail_message.put()
         
 app = webapp2.WSGIApplication([EmailHandlerV1.mapping()], debug=True)

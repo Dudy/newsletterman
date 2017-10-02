@@ -41,7 +41,10 @@ handlers:
 - url: /js
   static_dir: js
 
-- url: /v1/.*
+- url: /v1/content/.*
+  script: ContentHandlerV1.app
+
+- url: /v1/api/.*
   script: ApiHandlerV1.app
 
 - url: /.*
