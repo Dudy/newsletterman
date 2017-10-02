@@ -5,6 +5,9 @@ import webapp2
 from webapp2_extras import json
 from google.appengine.api import users
 
+from SubscriptionRequest import SubscriptionRequest
+from UserSubscription import UserSubscription
+
 class ApiHandlerV1(webapp2.RequestHandler):
 
     def firstBatch(self):
@@ -40,8 +43,24 @@ class ApiHandlerV1(webapp2.RequestHandler):
             self.response.write(json.encode(response))
         else:
             self.error(403)
+    
+    def newSubscriptionRequest(self):
+        user = users.get_current_user()
+        
+        if user:
+            requestObject = json.decode(self.request.body)
+            serviceUrl = requestObject['serviceUrl']
+
+            subscriptionRequest = SubscriptionRequest(serviceUrl = serviceUrl)
+            subscriptionRequest.put()
+            
+            userSubscription = UserSubscription(userId = user.user_id(), serviceUrl = serviceUrl)
+            userSubscription.put()
+        else:
+            self.error(403)
         
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/v1/api/newsletter', handler=ApiHandlerV1, handler_method='firstBatch', methods=['GET']),
-    webapp2.Route(r'/v1/api/newsletter/<current>/next', handler=ApiHandlerV1, name='current', handler_method='next', methods=['GET'])
+    webapp2.Route(r'/v1/api/newsletter/<current>/next', handler=ApiHandlerV1, name='current', handler_method='next', methods=['GET']),
+    webapp2.Route(r'/v1/api/newsletter/subscription', handler=ApiHandlerV1, handler_method='newSubscriptionRequest', methods=['POST'])
 ], debug=True)
