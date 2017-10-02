@@ -4,6 +4,7 @@ import webapp2
 import logging
 
 from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
+from google.appengine.ext import ndb
 
 from MailMessage import MailMessage
 
