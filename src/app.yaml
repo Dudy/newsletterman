@@ -48,7 +48,7 @@ handlers:
   script: ApiHandlerV1.app
 
 - url: /.*
-  script: Newsletterman.app
+  script: MainHandler.app
 
 # [START libraries]
 libraries:

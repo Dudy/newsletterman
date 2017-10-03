@@ -30,18 +30,20 @@
                         <li class="active"><a class="action" href="#newsletters">Newsletters</a></li>
                         <li><a class="action" href="#newSubscription">New Subscription</a></li>
                         <li><a href="#contact">Contact</a></li>
+                        
+                        {% if admin %}
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Action</a></li>
-                                <li><a href="#">Another action</a></li>
-                                <li><a href="#">Something else here</a></li>
+                                <li class="dropdown-header">User</li>
+                                <li><a href="#">Add</a></li>
+                                <li><a href="#">List</a></li>
                                 <li role="separator" class="divider"></li>
-                                <li class="dropdown-header">Nav header</li>
-                                <li><a href="#">Separated link</a></li>
-                                <li><a href="#">One more separated link</a></li>
+                                <li class="dropdown-header">Newsletter</li>
+                                <li><a href="#subscriptionRequests">Subscription Requests</a></li>
                             </ul>
                         </li>
+                        {% endif %}
                     </ul>
 
                     <ul class="nav navbar-nav pull-right">
@@ -67,27 +69,6 @@
                                 <span>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</span>
                             </div>
                         </li>
-                        
-                        <!--
-                        <li class="media">
-                            <div class="media-left">
-                                <img src="http://via.placeholder.com/60x60" class="media-object">
-                            </div>
-                            <div class="media-body">
-                                <h4>List-based media object</h4>
-                                <span>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</span>
-                            </div>
-                        </li>
-                        <li class="media">
-                            <div class="media-left">
-                                <img src="http://via.placeholder.com/60x60" class="media-object">
-                            </div>
-                            <div class="media-body">
-                                <h4 class="mt-0 mb-1">List-based media object</h4>
-                                <span>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</span>
-                            </div>
-                        </li>
-                        -->
                     </ul>
                 </div>
             </div>

@@ -12,7 +12,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
-class Newsletterman(webapp2.RequestHandler):
+class MainHandler(webapp2.RequestHandler):
 
     def index(self):
         user = users.get_current_user()
@@ -20,11 +20,13 @@ class Newsletterman(webapp2.RequestHandler):
         if user:
             template_values = {
                 'user': user,
+                'admin': users.is_current_user_admin(),
                 'url': users.create_logout_url(self.request.uri),
                 'url_linktext': 'Logout',
             }
         else:
             template_values = {
+                'admin': False,
                 'url': users.create_login_url(self.request.uri),
                 'url_linktext': 'Login',
             }
@@ -33,5 +35,5 @@ class Newsletterman(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
 app = webapp2.WSGIApplication([
-    webapp2.Route(r'/', handler=Newsletterman, handler_method='index', methods=['GET'])
+    webapp2.Route(r'/', handler=MainHandler, handler_method='index', methods=['GET'])
 ], debug=True)

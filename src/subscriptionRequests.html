@@ -1,0 +1,40 @@
+            <div class="row">
+                <div class="col-xs-12">
+                    <form>
+                        <div class="form-group">
+                            <h4>Please provide the URL of the page where you can submit your newsletter subscription.</h4>
+                            <label for="serviceUrl">Service URL</label>
+                            <input type="text" class="form-control" id="serviceUrl" aria-describedby="serviceUrlHelp" placeholder="Service URL">
+                            <small id="serviceUrlHelp" class="form-text text-muted">e.g. <a target="_blank" href="https://www.qatarairways.com/en/newsletter.html">https://www.qatarairways.com/en/newsletter.html</a></small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <button type="submit" class="btn" id="submitNewSubscription">Submit</button>
+                </div>
+            </div>
+            <div class="alert alert-success fade in" id="message">
+                <a href="#" class="close" data-dismiss="alert">&times;</a>
+                <strong>Success!</strong> Your subscription has been sent successfully. Please wait for the system to complete the subscription process.
+            </div>
+
+            <script>
+                $('#submitNewSubscription').on('click touch', function(event) {
+                    event.preventDefault();
+                    var url = BASE_URI + "/api/newsletter/subscription";
+                    var data = JSON.stringify({ serviceUrl: $('#serviceUrl').val() });
+                    $.post(url, data)
+                    .done(function() {
+                        var content = $('#message');
+                        $('#mainContent').empty();
+                        $('#mainContent').append(content);
+                        $('#message').show();
+                    })
+                    .fail(function(jqxhr, textStatus, error) {
+                        var err = textStatus + ", " + error;
+                        console.log("Request Failed: " + err);
+                    });
+                });
+            </script>
