@@ -1,40 +1,129 @@
+<div class="row">
+    <h4>Open Newsletter Subscription Requests</h4>
+    
+    <form class="form-inline" id="subscriptionRequest_form">
+        <div class="container subscriptionRequest" id="template_subscriptionRequest">
             <div class="row">
-                <div class="col-xs-12">
-                    <form>
-                        <div class="form-group">
-                            <h4>Please provide the URL of the page where you can submit your newsletter subscription.</h4>
-                            <label for="serviceUrl">Service URL</label>
-                            <input type="text" class="form-control" id="serviceUrl" aria-describedby="serviceUrlHelp" placeholder="Service URL">
-                            <small id="serviceUrlHelp" class="form-text text-muted">e.g. <a target="_blank" href="https://www.qatarairways.com/en/newsletter.html">https://www.qatarairways.com/en/newsletter.html</a></small>
-                        </div>
-                    </form>
+                <div class="col-xs-4">
+                    <input type="checkbox" name="template_subscription_checkbox" id="template_subscription_checkbox" class="css-checkbox" />
+                    <label for="template_subscriptionRequest_text" class="css-label">                    
+                        <input type="text" class="form-control" id="template_subscriptionRequest_text" placeholder="identifier">
+                    </label>
+                </div>
+                <div class="col-xs-8">
+                    <a href="#link" target="_blank"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> <span class="linktext">Link</span></a>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-xs-12">
-                    <button type="submit" class="btn" id="submitNewSubscription">Submit</button>
-                </div>
-            </div>
-            <div class="alert alert-success fade in" id="message">
-                <a href="#" class="close" data-dismiss="alert">&times;</a>
-                <strong>Success!</strong> Your subscription has been sent successfully. Please wait for the system to complete the subscription process.
-            </div>
+        </div>
+    </form>
+</div>
+<div class="row">
+    <button type="submit" class="btn" id="subscriptionRequest_submitButton">Submit</button>
+</div>
 
-            <script>
-                $('#submitNewSubscription').on('click touch', function(event) {
-                    event.preventDefault();
-                    var url = BASE_URI + "/api/newsletter/subscription";
-                    var data = JSON.stringify({ serviceUrl: $('#serviceUrl').val() });
-                    $.post(url, data)
-                    .done(function() {
-                        var content = $('#message');
-                        $('#mainContent').empty();
-                        $('#mainContent').append(content);
-                        $('#message').show();
-                    })
-                    .fail(function(jqxhr, textStatus, error) {
-                        var err = textStatus + ", " + error;
-                        console.log("Request Failed: " + err);
+<div class="row">
+    <div class="alert alert-danger fade in" id="template_message">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <strong>Error!</strong> You need to provide an identifier for each selected row.
+    </div>
+</div>
+
+<script>
+    var checkboxHandler = function(event) {
+        if (this.checked) {
+            $(this).parent().find('input[type=text]').attr('required', 'required');
+        } else {
+            var $text = $(this).parent().find('input[type=text]');
+            $text.removeAttr('required');
+            $text.removeClass('error');
+        }
+    };
+    
+    var textboxKeyHandler = function(event) {
+        $(this).removeClass('error');
+    };
+    
+    var counter = 0;
+    $.getJSON(BASE_URI + "/api/subscriptionRequests")
+    .done(function(subscriptionRequests) {
+        subscriptionRequests.forEach(function (request) {
+            var $newItem = $('#template_subscriptionRequest').clone();
+            $newItem.removeAttr('id');
+            
+            var $checkbox = $newItem.find('#template_subscription_checkbox');
+            $checkbox.attr('name', 'subscription_checkbox_' + counter);
+            $checkbox.attr('id', 'subscription_checkbox_' + counter);
+            $checkbox.data('counter', counter);
+            $checkbox.change(checkboxHandler);
+            
+            var $text = $newItem.find('#template_subscriptionRequest_text');
+            $text.attr('id', 'subscriptionRequest_text_' + counter);
+            $text.attr('name', 'subscriptionRequest_text_' + counter);
+            $text.data('counter', counter);
+            $text.data('serviceUrl', request.serviceUrl);
+            $text.parent().attr('for', 'subscription_checkbox_' + counter);
+            $text.on('keydown', textboxKeyHandler);
+            counter += 1;
+            
+            var $link = $newItem.find('a');
+            $link.attr('href', request.serviceUrl);
+            $link.find('.linktext').text(request.serviceUrl);
+            
+            $newItem.insertBefore($('#template_subscriptionRequest'));
+        });
+        currentItem = subscriptionRequests.length;
+    })
+    .fail(function (jqxhr, textStatus, error) {
+        var err = textStatus + ", " + error;
+        console.log("Request Failed: " + err);
+    });
+    
+    var showMErrorMessage = function() {
+        $newMessage = $('#template_message').clone();
+        $newMessage.removeAttr('id');
+        $newMessage.addClass('message');
+        $newMessage.insertBefore($('#template_message'));
+    };
+    
+    var subscriptionRequestFormSubmit = function(event) {
+        $("input[type=text]").removeClass("error");
+        $(".message").remove();
+        
+        var formdata = $("#subscriptionRequest_form").serializeArray();
+        var errors = 0;
+        var verifiedSubscriptions = [];
+        formdata.forEach(function (item) {
+            if (item.name.startsWith("subscription_checkbox_") && item.value === "on") {
+                var counter = item.name.substring(22);
+                var entry = formdata.find(entry => entry.name === "subscriptionRequest_text_" + counter);
+                var $text = $("#subscriptionRequest_text_" + counter);
+                if (entry.value === "") {
+                    $text.addClass("error");
+                    errors += 1;
+                } else {
+                    verifiedSubscriptions.push({
+                        "serviceUrl": $text.data("serviceUrl"),
+                        "serviceId" : entry.value
                     });
-                });
-            </script>
+                }
+            }
+        });
+        if (errors > 0) {
+            showMErrorMessage();
+        } else {
+            var url = BASE_URI + "/api/subscriptionRequests";
+            var data = JSON.stringify(verifiedSubscriptions);
+            $.post(url, data)
+            .done(function() {
+                $('nav a[href="#subscriptionRequests"]').click();
+            })
+            .fail(function(jqxhr, textStatus, error) {
+                var err = textStatus + ", " + error;
+                console.log("Request Failed: " + err);
+            });
+        }
+    };
+    
+    $('#subscriptionRequest_submitButton').on('click touch', subscriptionRequestFormSubmit);
+    $('#subscriptionRequest_form').on('submit', subscriptionRequestFormSubmit);
+</script>

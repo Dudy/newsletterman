@@ -4,13 +4,14 @@ import webapp2
 
 from webapp2_extras import json
 from google.appengine.api import users
+from google.appengine.ext import ndb
 
 from SubscriptionRequest import SubscriptionRequest
 from UserSubscription import UserSubscription
 
 class ApiHandlerV1(webapp2.RequestHandler):
 
-    def firstBatch(self):
+    def getFirstBatch(self):
         user = users.get_current_user()
         
         if user:
@@ -29,7 +30,7 @@ class ApiHandlerV1(webapp2.RequestHandler):
         else:
             self.error(403)
 
-    def next(self, current):
+    def getNext(self, current):
         user = users.get_current_user()
         
         if user:
@@ -44,23 +45,51 @@ class ApiHandlerV1(webapp2.RequestHandler):
         else:
             self.error(403)
     
-    def newSubscriptionRequest(self):
+    def postNewSubscriptionRequest(self):
         user = users.get_current_user()
         
         if user:
             requestObject = json.decode(self.request.body)
             serviceUrl = requestObject['serviceUrl']
-
             subscriptionRequest = SubscriptionRequest(serviceUrl = serviceUrl)
             subscriptionRequest.put()
-            
-            userSubscription = UserSubscription(userId = user.user_id(), serviceUrl = serviceUrl)
+            userSubscription = UserSubscription(userId = user.user_id(), serviceId = serviceUrl)
             userSubscription.put()
+        else:
+            self.error(403)
+    
+    def getSubscriptionRequests(self):
+        if users.is_current_user_admin():
+            subscriptionRequests = []
+            subscriptionRequestQuery = SubscriptionRequest.query()
+            for subscriptionRequest in subscriptionRequestQuery.iter():
+                subscriptionRequests.append({ 'serviceUrl': subscriptionRequest.serviceUrl })
+            self.response.content_type = 'application/json'
+            self.response.write(json.encode(subscriptionRequests))
+        else:
+            self.error(403)
+    
+    def postSubscriptionRequests(self):
+        if users.is_current_user_admin():
+            subscriptionRequests = json.decode(self.request.body)
+            for subscriptionRequest in subscriptionRequests:
+                serviceUrl = subscriptionRequest['serviceUrl']
+                serviceId = subscriptionRequest['serviceId']
+                query = UserSubscription.query(UserSubscription.serviceId == serviceUrl)
+                for userSubscription in query.iter():
+                    userSubscription.serviceId = serviceId
+                    userSubscription.put()
+                query = SubscriptionRequest.query(SubscriptionRequest.serviceUrl == serviceUrl)
+                list_of_keys = ndb.put_multi(query.fetch())
+                ndb.delete_multi(list_of_keys)
+                    
         else:
             self.error(403)
         
 app = webapp2.WSGIApplication([
-    webapp2.Route(r'/v1/api/newsletter', handler=ApiHandlerV1, handler_method='firstBatch', methods=['GET']),
-    webapp2.Route(r'/v1/api/newsletter/<current>/next', handler=ApiHandlerV1, name='current', handler_method='next', methods=['GET']),
-    webapp2.Route(r'/v1/api/newsletter/subscription', handler=ApiHandlerV1, handler_method='newSubscriptionRequest', methods=['POST'])
+    webapp2.Route(r'/v1/api/newsletter', handler=ApiHandlerV1, handler_method='getFirstBatch', methods=['GET']),
+    webapp2.Route(r'/v1/api/newsletter/<current>/next', handler=ApiHandlerV1, name='getCurrent', handler_method='next', methods=['GET']),
+    webapp2.Route(r'/v1/api/newsletter/subscription', handler=ApiHandlerV1, handler_method='postNewSubscriptionRequest', methods=['POST']),
+    webapp2.Route(r'/v1/api/subscriptionRequests', handler=ApiHandlerV1, handler_method='getSubscriptionRequests', methods=['GET']),
+    webapp2.Route(r'/v1/api/subscriptionRequests', handler=ApiHandlerV1, handler_method='postSubscriptionRequests', methods=['POST'])
 ], debug=True)

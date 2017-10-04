@@ -55,7 +55,11 @@ var loadFirstBatch = function() {
 
 $(document).ready(function() {
     // register action handler
-    $('.action').on('click touch', navActionHandler);
+    $('nav a:not(.dropdown-toggle)').on('click touch', navActionHandler);
     
     loadFirstBatch();
 });
+
+function isBlank(str) {
+    return (!str || /^\s*$/.test(str));
+}
