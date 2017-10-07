@@ -24,7 +24,7 @@ class ApiHandlerV1(webapp2.RequestHandler):
             for userSubscription in query.iter():
                 key = ndb.Key(MailMessage, userSubscription.serviceId)
                 mailQuery = MailMessage.query(ancestor = key).order(-MailMessage.create_date)
-                mails = mailQuery.fetch(limit = 5)
+                mails = mailQuery.fetch(limit = 2)
                 
                 for mail in mails:
                     mime_message_text = mail.mime_message
@@ -34,14 +34,18 @@ class ApiHandlerV1(webapp2.RequestHandler):
                     #html_bodies = mime_message.bodies('text/html')
 
                     for content_type, body in plaintext_bodies:
-                        decoded_html = body.decode()
+                        decoded_body = body.decode()
                     #for content_type, body in html_bodies:
-                    #    decoded_html = body.decode()
+                    #    decoded_body = body.decode()
+                    
+                    text = decoded_body[:160]
+                    if len(text) < len(decoded_body):
+                        text += '...'
                     
                     message_array.append({
                         'imageUrl': 'http://via.placeholder.com/60x60', 
                         'title': 'message from ' + str(mail.create_date),
-                        'text': decoded_html[:160] + '...'
+                        'text': text
                     })
             
             self.response.content_type = 'application/json'
@@ -53,14 +57,40 @@ class ApiHandlerV1(webapp2.RequestHandler):
         user = users.get_current_user()
         
         if user:
-            response = {
-                'imageUrl': 'http://via.placeholder.com/60x60', 
-                'title': 'Item ' + str(int(current) + 1) + ' of user ' + user.nickname(),
-                'text': 'Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.'
-            }
+            message = None
+            query = UserSubscription.query(UserSubscription.userId == user.user_id())
+            for userSubscription in query.iter():
+                key = ndb.Key(MailMessage, userSubscription.serviceId)
+                mailQuery = MailMessage.query(ancestor = key).order(-MailMessage.create_date)
+                mails = mailQuery.fetch(offset = int(current), limit = 1)
+                
+                if len(mails) > 0:
+                    mail = mails[0]
+                    mime_message_text = mail.mime_message
+                    mime_message = InboundEmailMessage(mime_message = mime_message_text)
 
-            self.response.content_type = 'application/json'
-            self.response.write(json.encode(response))
+                    plaintext_bodies = mime_message.bodies('text/plain')
+                    #html_bodies = mime_message.bodies('text/html')
+
+                    for content_type, body in plaintext_bodies:
+                        decoded_body = body.decode()
+                    #for content_type, body in html_bodies:
+                    #    decoded_body = body.decode()
+
+                    text = decoded_body[:160]
+                    if len(text) < len(decoded_body):
+                        text += '...'
+
+                    message = {
+                        'imageUrl': 'http://via.placeholder.com/60x60', 
+                        'title': 'message from ' + str(mail.create_date),
+                        'text': text
+                    }
+            if message:
+                self.response.content_type = 'application/json'
+                self.response.write(json.encode(message))
+            else:
+                self.error(404)
         else:
             self.error(403)
     
