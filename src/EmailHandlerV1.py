@@ -8,6 +8,8 @@ from google.appengine.ext import ndb
 
 from MailMessage import MailMessage
 
+# the email domain of this app is @pomis-newsletterman.appspotmail.com
+
 class EmailHandlerV1(InboundMailHandler):
 
     def receive(self, mail_message):
