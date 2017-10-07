@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
 import webapp2
+import logging
 
 from webapp2_extras import json
 from google.appengine.api import users
+from google.appengine.api.mail import InboundEmailMessage
 from google.appengine.ext import ndb
 
 from SubscriptionRequest import SubscriptionRequest
 from UserSubscription import UserSubscription
+from MailMessage import MailMessage
 
 class ApiHandlerV1(webapp2.RequestHandler):
 
@@ -15,18 +18,34 @@ class ApiHandlerV1(webapp2.RequestHandler):
         user = users.get_current_user()
         
         if user:
-            response = [{
-                'imageUrl': 'http://via.placeholder.com/60x60', 
-                'title': 'Item 1 of user ' + user.nickname(),
-                'text': 'Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.'
-            }, {
-                'imageUrl': 'http://via.placeholder.com/60x60', 
-                'title': 'Item 2 of user ' + user.nickname(),
-                'text': 'Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.'
-            }]
+            message_array = []
+            
+            query = UserSubscription.query(UserSubscription.userId == user.user_id())
+            for userSubscription in query.iter():
+                key = ndb.Key(MailMessage, userSubscription.serviceId)
+                mailQuery = MailMessage.query(ancestor = key).order(-MailMessage.create_date)
+                mails = mailQuery.fetch(limit = 5)
+                
+                for mail in mails:
+                    mime_message_text = mail.mime_message
+                    mime_message = InboundEmailMessage(mime_message = mime_message_text)
+                    
+                    plaintext_bodies = mime_message.bodies('text/plain')
+                    #html_bodies = mime_message.bodies('text/html')
+
+                    for content_type, body in plaintext_bodies:
+                        decoded_html = body.decode()
+                    #for content_type, body in html_bodies:
+                    #    decoded_html = body.decode()
+                    
+                    message_array.append({
+                        'imageUrl': 'http://via.placeholder.com/60x60', 
+                        'title': 'message from ' + str(mail.create_date),
+                        'text': decoded_html[:160] + '...'
+                    })
             
             self.response.content_type = 'application/json'
-            self.response.write(json.encode(response))
+            self.response.write(json.encode(message_array))
         else:
             self.error(403)
 
@@ -88,7 +107,7 @@ class ApiHandlerV1(webapp2.RequestHandler):
         
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/v1/api/newsletter', handler=ApiHandlerV1, handler_method='getFirstBatch', methods=['GET']),
-    webapp2.Route(r'/v1/api/newsletter/<current>/next', handler=ApiHandlerV1, name='getCurrent', handler_method='next', methods=['GET']),
+    webapp2.Route(r'/v1/api/newsletter/<current>/next', handler=ApiHandlerV1, name='current', handler_method='getNext', methods=['GET']),
     webapp2.Route(r'/v1/api/newsletter/subscription', handler=ApiHandlerV1, handler_method='postNewSubscriptionRequest', methods=['POST']),
     webapp2.Route(r'/v1/api/subscriptionRequests', handler=ApiHandlerV1, handler_method='getSubscriptionRequests', methods=['GET']),
     webapp2.Route(r'/v1/api/subscriptionRequests', handler=ApiHandlerV1, handler_method='postSubscriptionRequests', methods=['POST'])
