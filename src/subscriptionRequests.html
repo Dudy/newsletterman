@@ -43,9 +43,9 @@
         $(this).removeClass('error');
     };
     
-    var counter = 0;
     $.getJSON(BASE_URI + "/api/subscriptionRequests")
     .done(function(subscriptionRequests) {
+        var counter = 0;
         subscriptionRequests.forEach(function (request) {
             var $newItem = $('#template_subscriptionRequest').clone();
             $newItem.removeAttr('id');
