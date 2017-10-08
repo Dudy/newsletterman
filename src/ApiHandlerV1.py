@@ -99,11 +99,17 @@ class ApiHandlerV1(webapp2.RequestHandler):
         
         if user:
             requestObject = json.decode(self.request.body)
-            serviceUrl = requestObject['serviceUrl']
-            subscriptionRequest = SubscriptionRequest(serviceUrl = serviceUrl)
-            subscriptionRequest.put()
-            userSubscription = UserSubscription(userId = user.user_id(), serviceId = serviceUrl)
-            userSubscription.put()
+            
+            if isinstance(requestObject, list):
+                for serviceId in requestObject:
+                    userSubscription = UserSubscription(userId = user.user_id(), serviceId = serviceId)
+                    userSubscription.put()
+            else:
+                serviceUrl = requestObject['serviceUrl']
+                subscriptionRequest = SubscriptionRequest(serviceUrl = serviceUrl)
+                subscriptionRequest.put()
+                userSubscription = UserSubscription(userId = user.user_id(), serviceId = serviceUrl)
+                userSubscription.put()
         else:
             self.error(403)
     
@@ -134,11 +140,25 @@ class ApiHandlerV1(webapp2.RequestHandler):
                     
         else:
             self.error(403)
+    
+    def getExistingSubscriptions(self):
+        user = users.get_current_user()
         
+        if user:
+            existingSubscriptions = []
+            serviceIdsQuery = UserSubscription.query(projection = [UserSubscription.serviceId], distinct = True)
+            for projectedUserSubscription in serviceIdsQuery.iter():
+                existingSubscriptions.append({ 'serviceId': projectedUserSubscription.serviceId })
+            self.response.content_type = 'application/json'
+            self.response.write(json.encode(existingSubscriptions))
+        else:
+            self.error(403)
+
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/v1/api/newsletter', handler=ApiHandlerV1, handler_method='getFirstBatch', methods=['GET']),
     webapp2.Route(r'/v1/api/newsletter/<current>/next', handler=ApiHandlerV1, name='current', handler_method='getNext', methods=['GET']),
     webapp2.Route(r'/v1/api/newsletter/subscription', handler=ApiHandlerV1, handler_method='postNewSubscriptionRequest', methods=['POST']),
     webapp2.Route(r'/v1/api/subscriptionRequests', handler=ApiHandlerV1, handler_method='getSubscriptionRequests', methods=['GET']),
-    webapp2.Route(r'/v1/api/subscriptionRequests', handler=ApiHandlerV1, handler_method='postSubscriptionRequests', methods=['POST'])
+    webapp2.Route(r'/v1/api/subscriptionRequests', handler=ApiHandlerV1, handler_method='postSubscriptionRequests', methods=['POST']),
+    webapp2.Route(r'/v1/api/existingSubscriptions', handler=ApiHandlerV1, handler_method='getExistingSubscriptions', methods=['GET'])
 ], debug=True)
