@@ -43,7 +43,7 @@ class ApiHandlerV1(webapp2.RequestHandler):
                         text += '...'
                     
                     message_array.append({
-                        'imageUrl': 'http://via.placeholder.com/60x60', 
+                        'imageUrl': 'https://via.placeholder.com/60x60', 
                         'title': 'message from ' + str(mail.create_date),
                         'text': text
                     })
@@ -82,7 +82,7 @@ class ApiHandlerV1(webapp2.RequestHandler):
                         text += '...'
 
                     message = {
-                        'imageUrl': 'http://via.placeholder.com/60x60', 
+                        'imageUrl': 'https://via.placeholder.com/60x60', 
                         'title': 'message from ' + str(mail.create_date),
                         'text': text
                     }
