@@ -1,0 +1,121 @@
+            <div class="row">
+                <div class="col-xs-12">
+                    <h4>You may provide a URL for subscription to a new newsletter or choose one from the existing ones below.</h4>
+                    <br><br>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <h4>Provide the URL of the page where you can submit your newsletter subscription.</h4>
+                    <form id="newSubscriptionForm">
+                        <div class="form-group">
+                            <label for="serviceUrl">Service URL</label>
+                            <input type="text" class="form-control" id="serviceUrl" aria-describedby="serviceUrlHelp" placeholder="Service URL">
+                            <small id="serviceUrlHelp" class="form-text text-muted">e.g. <a target="_blank" href="https://www.qatarairways.com/en/newsletter.html">https://www.qatarairways.com/en/newsletter.html</a></small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <button type="submit" class="btn" id="submitNewSubscription">Submit</button>
+                </div>
+            </div>
+
+            <br><br>
+
+<div class="row">
+    <div class="col-xs-12">
+        <h4>Choose Existing Newsletters</h4>
+        <form class="form-inline" id="existingSubscriptionForm">
+            <div class="container existingSubscriptionRequest" id="template_existingSubscriptionRequest">
+                <div class="row">
+                    <div class="col-xs-1">
+                        <input type="checkbox" name="template_existingSubscription_checkbox" id="template_existingSubscription_checkbox" class="css-checkbox" />
+                        <label for="template_existingSubscriptionRequest_text" class="css-label"></label>
+                    </div>
+                    <div class="col-xs-11">
+                        <input type="text" class="form-control" id="template_existingSubscriptionRequest_text" placeholder="identifier">
+                        <!--<p>Heise Top News</p>-->
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+            
+            
+            
+            
+
+            <div class="alert alert-success fade in" id="message">
+                <a href="#" class="close" data-dismiss="alert">&times;</a>
+                <strong>Success!</strong> Your subscription has been sent successfully. Please wait for the system to complete the subscription process.
+            </div>
+
+            <script>
+                $('#newSubscriptionForm').submit(function(event) {
+                    event.preventDefault();
+                    var url = BASE_URI + "/api/newsletter/subscription";
+                    var data = JSON.stringify({ serviceUrl: $('#serviceUrl').val() });
+                    $.post(url, data)
+                    .done(function() {
+                        var content = $('#message');
+                        $('#mainContent').empty();
+                        $('#mainContent').append(content);
+                        $('#message').show();
+                    })
+                    .fail(function(jqxhr, textStatus, error) {
+                        var err = textStatus + ", " + error;
+                        console.log("Request Failed: " + err);
+                    });
+                });
+                $('#submitNewSubscription').on('click touch', function(event) {
+                    event.preventDefault();
+                    $('#newSubscriptionForm').submit();
+                });
+                
+                
+                
+                
+                
+                
+                
+                $.getJSON(BASE_URI + "/api/existingSubscriptions")
+                .done(function(existingSubscriptions) {
+                    existingSubscriptions.forEach(function (request) {
+                        
+                        console.log(request);
+                        
+//                        var $newItem = $('#template_subscriptionRequest').clone();
+//                        $newItem.removeAttr('id');
+//
+//                        var $checkbox = $newItem.find('#template_subscription_checkbox');
+//                        $checkbox.attr('name', 'subscription_checkbox_' + counter);
+//                        $checkbox.attr('id', 'subscription_checkbox_' + counter);
+//                        $checkbox.data('counter', counter);
+//                        $checkbox.change(checkboxHandler);
+//
+//                        var $text = $newItem.find('#template_subscriptionRequest_text');
+//                        $text.attr('id', 'subscriptionRequest_text_' + counter);
+//                        $text.attr('name', 'subscriptionRequest_text_' + counter);
+//                        $text.data('counter', counter);
+//                        $text.data('serviceUrl', request.serviceUrl);
+//                        $text.parent().attr('for', 'subscription_checkbox_' + counter);
+//                        $text.on('keydown', textboxKeyHandler);
+//                        counter += 1;
+//
+//                        var $link = $newItem.find('a');
+//                        $link.attr('href', request.serviceUrl);
+//                        $link.find('.linktext').text(request.serviceUrl);
+//
+//                        $newItem.insertBefore($('#template_subscriptionRequest'));
+                    });
+                    currentItem = existingSubscriptions.length;
+                })
+                .fail(function (jqxhr, textStatus, error) {
+                    var err = textStatus + ", " + error;
+                    console.log("Request Failed: " + err);
+                });
+            </script>

@@ -1,44 +1,158 @@
-            <div class="row">
-                <div class="col-xs-12">
-                    <form id="newSubscriptionForm">
-                        <div class="form-group">
-                            <h4>Please provide the URL of the page where you can submit your newsletter subscription.</h4>
-                            <label for="serviceUrl">Service URL</label>
-                            <input type="text" class="form-control" id="serviceUrl" aria-describedby="serviceUrlHelp" placeholder="Service URL">
-                            <small id="serviceUrlHelp" class="form-text text-muted">e.g. <a target="_blank" href="https://www.qatarairways.com/en/newsletter.html">https://www.qatarairways.com/en/newsletter.html</a></small>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12">
-                    <button type="submit" class="btn" id="submitNewSubscription">Submit</button>
-                </div>
-            </div>
-            <div class="alert alert-success fade in" id="message">
-                <a href="#" class="close" data-dismiss="alert">&times;</a>
-                <strong>Success!</strong> Your subscription has been sent successfully. Please wait for the system to complete the subscription process.
-            </div>
+<div class="row">
+    <div class="col-xs-12">
+        <h4>You may provide a URL for subscription to a new newsletter or choose one from the existing ones below</h4>
+        <br><br>
+    </div>
+</div>
 
-            <script>
-                $('#newSubscriptionForm').submit(function(event) {
-                    event.preventDefault();
-                    var url = BASE_URI + "/api/newsletter/subscription";
-                    var data = JSON.stringify({ serviceUrl: $('#serviceUrl').val() });
-                    $.post(url, data)
-                    .done(function() {
-                        var content = $('#message');
-                        $('#mainContent').empty();
-                        $('#mainContent').append(content);
-                        $('#message').show();
-                    })
-                    .fail(function(jqxhr, textStatus, error) {
-                        var err = textStatus + ", " + error;
-                        console.log("Request Failed: " + err);
-                    });
-                });
-                $('#submitNewSubscription').on('click touch', function(event) {
-                    event.preventDefault();
-                    $('#newSubscriptionForm').submit();
-                });
-            </script>
+<div class="row">
+    <div class="col-xs-12">
+        <h4>Provide the URL of the page where you can submit your newsletter subscription.</h4>
+        <form id="newSubscriptionForm">
+            <div class="form-group">
+                <label for="serviceUrl">Service URL</label>
+                <input type="text" class="form-control" id="serviceUrl" aria-describedby="serviceUrlHelp" placeholder="Service URL">
+                <small id="serviceUrlHelp" class="form-text text-muted">e.g. <a target="_blank" href="https://www.qatarairways.com/en/newsletter.html">https://www.qatarairways.com/en/newsletter.html</a></small>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <button type="submit" class="btn" id="submitNewSubscription">Submit</button>
+    </div>
+</div>
+
+<br><br>
+
+<div class="row">
+    <div class="col-xs-12">
+        <h4>Choose Existing Newsletters</h4>
+
+        <form class="form-horizontal" id="existingSubscriptionForm">
+            <div class="form-group" id="template_existingSubscriptionRequest">
+                <div class="col-sm-12">
+                    <div class="checkbox">
+<!--                        <input type="checkbox" name="checkboxG4" id="checkboxG4" class="css-checkbox" />
+                        <label for="checkboxG4" class="css-label">Option 1</label>-->
+                        
+                        
+                        <label>
+                            <input type="checkbox">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <button type="submit" class="btn" id="submitExistingSubscription">Submit</button>
+    </div>
+</div>
+
+<div class="alert alert-success fade in" id="message">
+    <a href="#" class="close" data-dismiss="alert">&times;</a>
+    <strong>Success!</strong> Your subscription has been sent successfully. Please wait for the system to complete the subscription process.
+</div>
+
+<div class="alert alert-success fade in" id="message2">
+    <a href="#" class="close" data-dismiss="alert">&times;</a>
+    <strong>Success!</strong> Your chosen subscriptions are now registered for you. Navigate to "Newsletters" to see them.
+</div>
+
+<script>
+    $('#newSubscriptionForm').submit(function (event) {
+        event.preventDefault();
+        var url = BASE_URI + "/api/newsletter/subscription";
+        var data = JSON.stringify({serviceUrl: $('#serviceUrl').val()});
+        $.post(url, data)
+        .done(function () {
+            var content = $('#message');
+            $('#mainContent').empty();
+            $('#mainContent').append(content);
+            $('#message').show();
+        })
+        .fail(function (jqxhr, textStatus, error) {
+            var err = textStatus + ", " + error;
+            console.log("Request Failed: " + err);
+        });
+    });
+    $('#submitNewSubscription').on('click touch', function (event) {
+        event.preventDefault();
+        $('#newSubscriptionForm').submit();
+    });
+
+    $('#existingSubscriptionForm').submit(function (event) {
+        event.preventDefault();
+        var url = BASE_URI + "/api/newsletter/subscription";
+        var formdata = $("#existingSubscriptionForm").serializeArray();
+        var existingSubscriptions = [];
+        formdata.forEach(function (item) {
+            existingSubscriptions.push(item.value);
+        });
+        
+        var data = JSON.stringify(existingSubscriptions);
+        $.post(url, data)
+        .done(function () {
+            var content = $('#message2');
+            $('#mainContent').empty();
+            $('#mainContent').append(content);
+            $('#message2').show();
+        })
+        .fail(function (jqxhr, textStatus, error) {
+            var err = textStatus + ", " + error;
+            console.log("Request Failed: " + err);
+        });
+    });
+    $('#submitExistingSubscription').on('click touch', function (event) {
+        event.preventDefault();
+        $('#existingSubscriptionForm').submit();
+    });
+
+    $.getJSON(BASE_URI + "/api/existingSubscriptions")
+    .done(function (existingSubscriptions) {
+        var counter = 0;
+        existingSubscriptions.forEach(function (existingSubscription) {
+            var $newItem = $('#template_existingSubscriptionRequest').clone();
+            $newItem.removeAttr('id');
+
+            var $checkbox = $newItem.find('input[type="checkbox"]');
+            $checkbox.attr('name', 'existingSubscription_checkbox_' + counter);
+            $checkbox.attr('id', 'existingSubscription_checkbox_' + counter);
+            $checkbox.attr('value', existingSubscription.serviceId);
+
+            var $label = $checkbox.parent();
+            $label.html($label.html() + " " + existingSubscription.serviceId);
+
+            counter += 1;
+
+            $newItem.insertBefore($('#template_existingSubscriptionRequest'));
+        });
+        currentItem = existingSubscriptions.length;
+    })
+    .fail(function (jqxhr, textStatus, error) {
+        var err = textStatus + ", " + error;
+        console.log("Request Failed: " + err);
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
