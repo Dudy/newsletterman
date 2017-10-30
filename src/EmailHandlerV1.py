@@ -17,6 +17,9 @@ class EmailHandlerV1(InboundMailHandler):
 
         # store message
         service_id = mail_message.to.split('@')[0]
+        if '<' in service_id:
+            service_id = service_id.split('<')[1]
+        
         mime_message = str(mail_message.to_mime_message())
         service_key = ndb.Key(MailMessage, service_id)
         new_id = ndb.Model.allocate_ids(size = 1, parent = service_key)[0]
