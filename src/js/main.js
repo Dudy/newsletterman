@@ -16,6 +16,13 @@ var navActionHandler = function(event) {
     });
 };
 
+var openInNewTab = function(body) {
+    var newTab = window.open();
+    newTab.document.open();
+    newTab.document.write(body);
+    newTab.document.close();
+};
+
 var loadFirstBatch = function() {
     $.getJSON(BASE_URI + "/api/newsletter")
     .done(function (newsletteritems) {
@@ -26,6 +33,7 @@ var loadFirstBatch = function() {
             $newItem.find('h4').text(item.title);
             $newItem.find('span').text(item.text);
             $newItem.insertBefore($template_block);
+            $newItem.on('click touch', function() {openInNewTab(item.body);});
         });
         currentItem = newsletteritems.length;
     })
@@ -44,6 +52,7 @@ var loadFirstBatch = function() {
             $newItem.find('h4').text(item.title);
             $newItem.find('span').text(item.text);
             $newItem.insertBefore($template_block);
+            $newItem.on('click touch', function() {openInNewTab(item.body);});
             currentItem = currentItem + 1;
         })
         .fail(function (jqxhr, textStatus, error) {

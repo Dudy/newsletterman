@@ -45,7 +45,8 @@ class ApiHandlerV1(webapp2.RequestHandler):
                     message_array.append({
                         'imageUrl': 'https://via.placeholder.com/60x60', 
                         'title': 'message from ' + str(mail.create_date),
-                        'text': text
+                        'text': text,
+                        'body': decoded_body
                     })
             
             self.response.content_type = 'application/json'
@@ -84,7 +85,8 @@ class ApiHandlerV1(webapp2.RequestHandler):
                     message = {
                         'imageUrl': 'https://via.placeholder.com/60x60', 
                         'title': 'message from ' + str(mail.create_date),
-                        'text': text
+                        'text': text,
+                        'body': decoded_body
                     }
             if message:
                 self.response.content_type = 'application/json'
