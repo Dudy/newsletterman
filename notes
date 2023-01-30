@@ -1,0 +1,49 @@
+Newsletterman
+
+Benutzer können Email-Newsletter abonnieren. Sie werden dann vom System empfangen. Der User bekommt die Nachrichten
+wie in einem Social Media Client in kleinen Brocken zum Scrollen angezeigt. Wenn ihm der Teaser gefällt, klickt er
+drauf und bekommt die ganze Nachricht angezeigt.
+
+Der Email-Newsletter wird mit einer internen Email Adresse (input@newsletterman.com) verwaltet (also abonniert und
+regelmäßig abgeholt). Die News werden intern gecacht. Wenn User eine News lesen wollen, kommt sie aus dem Cache, nicht
+von einer Website oder aus einer Email.
+
+erste paar Use Cases (für User)
+- registrieren (kommt später)
+- anmelden (kommt später)
+- Seite mit News anzeigen
+- eine News lesen
+- "Newsletter verwalten" (Menüpunkt, Seite)
+- Newsletter abonnieren
+- Newsletter abbestellen
+
+erste paar Use Cases (systemisch)
+- neuen Newsletter abonnieren
+- Newsletter abbestellen
+- neue News von Mailserver holen
+- News in DB speichern
+
+UI
+- praktisch nur mobile, schmale mittlere Spalte mit News-Blöcken
+
+Systemaufbau
+- Frontend: mobile only News-Viewer
+- Backend: REST-API (siehe unten)
+    - ein Subsystem für News
+    - ein Subsystem für Newsletterverwaltung
+- Datenbank
+    - pro User abonnierte Newsletter
+    - die eigentlichen News
+
+Entities
+- User
+- UserAbo (User-Newsletter Zuordnung)
+- Newsletter
+- News
+
+REST-API
+- GET /news
+- GET /news/{id}
+- GET /newsletters
+- POST /newsletters
+- DELETE /newsletters/{id}
