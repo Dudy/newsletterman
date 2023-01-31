@@ -1,0 +1,77 @@
+noted down with inspiration from https://www.youtube.com/watch?v=CnailTcJV_U&ab_channel=DevMastery
+
+We do Clean Architecture (https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).
+
+// -----------------------------------------------------------------------------------------------
+// Entities
+// -----------------------------------------------------------------------------------------------
+- innermost "layer"
+- no dependencies on other modules
+    - no import statements
+    - (except general 3rd party utility libraries)
+- dependencies are injected (see below)
+- internal structure of the file
+    - we need an entity constructor, which is a plain method, say "makeEntity(data)"
+    - it has a parameter that contains all the data that is needed to construct the entity
+    - but the constructor function is not exported, instead a factory method is exported,
+      that returns the constructor method and takes dependencies as parameters that are also
+      needed for entity construction
+- example:
+        export function buildMakePerson({ idGenerator, makeAddress }) {
+            return function({ name, birthDate, street, city }) {
+                if (!name || name.length < 1) {
+                    throw new Error('Name must at least be one character long.')
+                }
+                if (!birthdate) {
+                    throw new Error('Birthdate is mandatory.')
+                }
+                if (birthdate > Date.now()) {
+                    throw new Error('Birthdate can not be in the future.')
+                }
+                if (!street) {
+                    throw new Error('Street is mandatory.')
+                }
+                if (!city) {
+                    throw new Error('City is mandatory.')
+                }
+                let address = makeAddress(street, city);
+                return Object.freeze({
+                    getId: () => idGenerator.makeId(),
+                    getCreateDate: () => Date.now(),
+                    getAge: () => deceasedDate || Date.now() - birthDate,
+                    getAddress: () => address,
+                    changeStreet: (street) => address = makeAddress(street, city),
+                    markDeceased: () => {
+                        name += ' (deceased)';
+                        deceasedDate = Date.now();
+                    }
+                })
+            }
+        }
+- this is testable easily by injecting test mocks/stubs
+- this is independant of the implementation of the dependencies
+    - e.g. I could easily switch from a numeric to an alphanumeric ID-generator without touching
+      this entity constructor again
+- the entity can never be in an invalid state, except for when there are errors in the
+  constructor, so any problem will stem from constructor code
+- now for dependendy injection
+    - "besides" the entity file is a "index.js" file, that takes care of the dependencies (i.e.
+      does imports) and calls the factory method "buildMakeEntity" to initialize the configured
+      constructor method (i.e. injects the dependencies)
+    - it also exports the "makeEntity" method for use in higher layers
+
+// -----------------------------------------------------------------------------------------------
+// Use Cases
+// -----------------------------------------------------------------------------------------------
+- "above" the entities
+- can have dependencies on entities
+
+
+
+
+
+
+Where does my logic live?
+- business logic goes into entities
+    - e.g. validation rules
+- 
