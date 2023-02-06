@@ -6,6 +6,7 @@ We do Clean Architecture (https://blog.cleancoder.com/uncle-bob/2012/08/13/the-c
 // Entities
 // -----------------------------------------------------------------------------------------------
 - innermost "layer"
+- entities define the inner data model of the business part of the application
 - no dependencies on other modules
     - no import statements
     - (except general 3rd party utility libraries)
@@ -65,6 +66,10 @@ We do Clean Architecture (https://blog.cleancoder.com/uncle-bob/2012/08/13/the-c
 // -----------------------------------------------------------------------------------------------
 - "above" the entities
 - can have dependencies on entities
+- use cases define logic on how to handle entities
+- they are implemented in the same way: use a factory method with injected dependencies that
+  creates a constructor method with only run-time use parameters with no dependencies
+- 
 
 
 
